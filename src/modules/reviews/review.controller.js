@@ -1,52 +1,40 @@
+
+
 const ReviewService = require("./review.service");
-const serialize = require("../../shared/utils/serialize");
 
 class ReviewController {
-  static async create(req, res) {
+    async create(req, res) {
+        try {
+            const review = await ReviewService.create({
+                ...req.body,
+            userId: req.user.id
+            //nessa atualização passo a puxar do Token, não mais do body como inicialmente
+            // 
+        });
+            res.status(201).json(review);
+    } catch (error){
+        res.status(400).json({ error: error.message });
+    }
+}
+
+    async findByProduct(req, res) {
+        const reviews = await reviewService.findByProduct(req.params.productId);
+        res.json(reviews);
+    }
+
+  async update(req, res) {
     try {
-      const review = await ReviewService.create(req.body);
-      res.status(201).json(serialize(review));
+      const review = await reviewService.update(req.params.id, req.body);
+      res.json(review);
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
   }
 
-  static async findAll(req, res) {
-    try {
-      const reviews = await ReviewService.findAll();
-      res.json(serialize(reviews));
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  }
-
-  static async findById(req, res) {
-    try {
-      const review = await ReviewService.findById(req.params.id);
-      if (!review) return res.status(404).json({ error: "Avaliação não encontrada" });
-      res.json(serialize(review));
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  }
-
-  static async update(req, res) {
-    try {
-      const review = await ReviewService.update(req.params.id, req.body);
-      res.json(serialize(review));
-    } catch (error) {
-      res.status(404).json({ error: error.message });
-    }
-  }
-
-  static async delete(req, res) {
-    try {
-      await ReviewService.delete(req.params.id);
-      res.status(204).send();
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
+  async delete(req, res) {
+    await reviewService.delete(req.params.id);
+    res.json({ message: "Avaliação deletada com sucesso" });
   }
 }
 
-module.exports = ReviewController;
+module.exports = new ReviewController();

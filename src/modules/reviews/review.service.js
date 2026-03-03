@@ -1,51 +1,67 @@
-const prisma = require("../../database/prisma");
+
+
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
 class ReviewService {
-  static async create(data) {
+  async create({ nota, descricao, produto_id, usuario_id}) {
+
+    const notaNumber = Number(nota);
+    const produtoIdNumber = Number(produto_id);
+    const usuarioIdNumber = Number(usuario_id);
+
+    //Validar Nota
+    if (!notaNumber < 1 || notaNumber > 5) {
+      throw new Error("Nota deve ser entre 1 e 5");
+    }
+
+    //Verificar se usuário comprou o produto
+    const hasPurchased = await prisma.orderItem.findFirst({
+      where: {
+        productId: produtoIdNumber,
+        order: {
+          userId: usuarioIdNumber
+        }
+      }
+    });
+
+    if (!hasPurchased) {
+      throw new Error("Você só pode avaliar produtos que comprou");
+    }
+
+    //Criar avaliacao
+  
+
     return await prisma.avaliacoes.create({
-      data: {
-        nota: BigInt(data.nota),
-        descricao: data.descricao,
-        usuario_id: parseInt(data.usuario_id),
-        produto_id: parseInt(data.produto_id)
-      },
-      include: { usuarios: true, produtos: true }
-    });
-  }
+      data: { 
+        nota: notaNumber,
+        descricao: descricao,
+        produto_id: produtoIdNumber,
+        usuario_id: usuarioIdNumber
+    }
+  });
+}
 
-  static async findAll() {
+  //cálculo de média de avaliação
+  async findByProduct(produto_id) {
     return await prisma.avaliacoes.findMany({
-      include: { usuarios: true, produtos: true }
-    });
-  }
-
-  static async findById(id) {
-    return await prisma.avaliacoes.findUnique({
-      where: { id: parseInt(id) },
-      include: { usuarios: true, produtos: true }
-    });
-  }
-
-  static async findByProduct(productId) {
-    return await prisma.avaliacoes.findMany({
-      where: { produto_id: parseInt(productId) },
+      where: { produto_id: Number(produto_id) },
       include: { usuarios: true }
     });
   }
 
-  static async update(id, data) {
+  async update(id, data) {
     return await prisma.avaliacoes.update({
-      where: { id: parseInt(id) },
-      data: {
-        nota: data.nota ? BigInt(data.nota) : undefined,
-        descricao: data.descricao
-      }
+      where: { id: Number(id) },
+      data
     });
   }
 
-  static async delete(id) {
-    return await prisma.avaliacoes.delete({ where: { id: parseInt(id) } });
+  async delete(id) {
+    return await prisma.avaliacoes.delete({
+      where: { id: Number(id) }
+    });
   }
 }
 
-module.exports = ReviewService;
+module.exports = new ReviewService();

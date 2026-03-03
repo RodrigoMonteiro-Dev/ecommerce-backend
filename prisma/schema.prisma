@@ -9,13 +9,27 @@
 
   model avaliacoes {
     id         Int      @id @default(autoincrement())
-    nota       BigInt
+    nota       Int
     descricao  String?  @db.VarChar(255)
     usuario_id Int
     produto_id Int
     usuarios   usuarios @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "avaliacoes_fk3")
     produtos   produtos @relation(fields: [produto_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "avaliacoes_fk4")
   }
+
+  model order {
+  id         Int @id @default(autoincrement())
+  userId     Int
+  items      OrderItem[]
+}
+
+  model OrderItem {
+  id         Int @id @default(autoincrement())
+  orderId    Int
+  productId  Int
+
+  order      Order @relation(fields: [orderId], references: [id])
+}
 
   model banner {
     id         Int      @id @default(autoincrement())
