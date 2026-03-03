@@ -1,17 +1,3 @@
-<<<<<<< HEAD
-let currentId = 1;
-const orders = [];
-
-class OrderService {
-    create(data) {
-        const newOrder = {
-            id: currentId++,
-            user_id: data.user_id,
-            status: data.status || "pending",
-            valor_total: data.valor_total || 0,
-            logradouro: data.logradouro,
-            numero: data.numero,
-=======
 const { prisma } = require('../../database/prisma');
 const AppError = require('../../shared/errors/AppError');
 
@@ -162,43 +148,10 @@ class OrderService {
             logradouro: data.logradouro,
             numero: data.numero,
             complemento: data.complemento || null,
->>>>>>> main
             bairro: data.bairro,
             cidade: data.cidade,
             estado: data.estado,
             cep: data.cep,
-<<<<<<< HEAD
-            created_at: new Date()
-        };
-        orders.push(newOrder);
-        return newOrder;
-    }
-
-    findAll() {
-        return orders;
-    }
-
-    findById(id) {
-        return orders.find(order => order.id === parseInt(id)) || null;
-    }
-
-    update(id, data) {
-        const order = this.findById(id);
-        if (!order) return null;
-        Object.assign(order, data);
-        return order;
-    }
-
-    delete(id) {
-        const index = orders.findIndex(order => order.id === parseInt(id));
-        if (index === -1) return false;
-        orders.splice(index, 1);
-        return true;
-    }
-}
-
-module.exports = new OrderService();
-=======
             cupom_id: data.cupom_id || null,
             previsao_entrega: data.previsao_entrega 
               ? new Date(data.previsao_entrega) 
@@ -569,4 +522,3 @@ module.exports = new OrderService();
 }
 
 module.exports = new OrderService();
->>>>>>> main
