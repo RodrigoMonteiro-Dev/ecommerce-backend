@@ -11,7 +11,7 @@ class OrderController {
     }
   }
 
- static async findAll(req, res) {
+  static async findAll(req, res) {
     try {
       const isAdmin = req.usuario?.nivel === 'admin';
       const pedidos = await OrderService.findAll(req.usuarioId, isAdmin);
@@ -32,7 +32,7 @@ class OrderController {
       res.json(pedido);
     } catch (error) {
       res.status(error.message === "Acesso negado" ? 403 : 404)
-         .json({ erro: error.message });
+        .json({ erro: error.message });
     }
   }
 
